@@ -14,7 +14,7 @@ import (
 // Campaign is a struct representing a created campaign
 type Campaign struct {
 	Id            int64     `json:"id"`
-	UserId        int64     `json:"-"`
+	Usekeyname        int64     `json:"-"`
 	Name          string    `json:"name" sql:"not null"`
 	CreatedDate   time.Time `json:"created_date"`
 	LaunchDate    time.Time `json:"launch_date"`
@@ -127,7 +127,7 @@ var ErrSMTPNotFound = errors.New("Sending profile not found")
 var ErrInvalidSendByDate = errors.New("The launch date must be before the \"send emails by\" date")
 
 // RecipientParameter is the URL parameter that points to the result ID for a recipient.
-const RecipientParameter = "rid"
+const RecipientParameter = "keyname"
 
 // Validate checks to make sure there are no invalid fields in a submitted campaign
 func (c *Campaign) Validate() error {
@@ -455,7 +455,7 @@ func PostCampaign(c *Campaign, uid int64) error {
 		return err
 	}
 	// Fill in the details
-	c.UserId = uid
+	c.Usekeyname = uid
 	c.CreatedDate = time.Now().UTC()
 	c.CompletedDate = time.Time{}
 	c.Status = CampaignQueued
@@ -559,7 +559,7 @@ func PostCampaign(c *Campaign, uid int64) error {
 				},
 				Status:       StatusScheduled,
 				CampaignId:   c.Id,
-				UserId:       c.UserId,
+				Usekeyname:       c.Usekeyname,
 				SendDate:     sendDate,
 				Reported:     false,
 				ModifiedDate: c.CreatedDate,
@@ -589,9 +589,9 @@ func PostCampaign(c *Campaign, uid int64) error {
 				"send_date": sendDate,
 			}).Debug("creating maillog")
 			m := &MailLog{
-				UserId:     c.UserId,
+				Usekeyname:     c.Usekeyname,
 				CampaignId: c.Id,
-				RId:        r.RId,
+				keyname:        r.keyname,
 				SendDate:   sendDate,
 				Processing: processing,
 			}
